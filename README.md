@@ -42,9 +42,7 @@ Note: pagesize is currently hardcoded to 10.  If your server responds with data 
 
 You can use fnLabelMapper to render the "label" key for the user to chose from - IE, they'd get to select one of these (again, with respect to 'usage' example above):
 
-option 1
-option 2
-...
+<ul><li>option 1</li><li>option 2</li>...</ul>
 
 When the user makes a selection, the entire associated object is passed to fnSelectionCB - IE, if the user selected "option 1", fnSelectionCB would receive {label: "option 1", name: "foo"}.
 
