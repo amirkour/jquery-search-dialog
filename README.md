@@ -30,6 +30,24 @@ $("input.searchBox").searchDialog({
 });
 ```
 
+Example
+-------
+Assume you initialize a textbox with the code shown in the 'usage' section above.  Searching for "foo bar baz" would result in the following http-get request:
+
+http://your.domain.com/service/json/coolData?f=foo&f=bar&f=baz&page=0&pagesize=10
+
+Note: pagesize is currently hardcoded to 10.  If your server responds with data looking like this:
+
+[{label: "option 1", name: "foo"}, {label: "option 2", name: "bar"}, ... ]
+
+You can use fnLabelMapper to render the "label" key for the user to chose from - IE, they'd get to select one of these (again, with respect to 'usage' example above):
+
+option 1
+option 2
+...
+
+When the user makes a selection, the entire associated object is passed to fnSelectionCB - IE, if the user selected "option 1", fnSelectionCB would receive {label: "option 1", name: "foo"}.
+
 API
 ---
 ```javascript
