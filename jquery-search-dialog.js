@@ -1,3 +1,23 @@
+/*
+ * jquery-search-dialog.js
+ *
+ * A jquery plugin that creates a popup window on any dom element (though
+ * it's intended usage is on textboxes) for searching and paging through
+ * server data.
+ *
+ * Usage:
+ * var $input=$("input.searchBox");
+ * $input.searchDialog({ ... options ... });
+ *
+ * Now when $input gains focus, the search popup will appear.  Typing
+ * search terms in $input and hitting 'enter' will send a query to
+ * the server and display the results for user selection.
+ *
+ * Additional notes and documentation:
+ * https://github.com/amirkour/jquery-search-dialog
+ *
+ * Depends on jquery, and currently only tested/verified on jquery 1.9+.
+ */
 (function($,document,undefined){
 	var $body=$("body");
 
@@ -339,9 +359,7 @@
 
 		if(!options || typeof options==='object'){
 			functionToCall=fnPluginInit;
-			defaultoptions={//todo - do i need this? might be able to use defaults in fnPluginInit..?
-				foo:"bar"
-			};
+			defaultoptions={};//todo - do i need this? might be able to use defaults in fnPluginInit..?
 			argsToPass=[$.extend(defaultoptions, options)];
 		}else if(typeof options==='string'){
 			functionToCall=fnGetPluginFunctionFor(options);
