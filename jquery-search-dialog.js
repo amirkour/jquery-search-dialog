@@ -41,48 +41,48 @@
     };
 
     var $exitButtonBase = $(document.createElement("button"))
-						.html("X")//TODO - customizable?
-						.addClass(cssClasses.exitButtonClass)
-						.css("float", "right"); //todo - customizable?
+                        .html("X")//TODO - customizable?
+                        .addClass(cssClasses.exitButtonClass)
+                        .css("float", "right"); //todo - customizable?
 
     var $dialogBase = $(document.createElement("div"))
-					.addClass(cssClasses.dialogClass)
-					.css("position", "absolute")
-					.css("z-index", 99999)
-					.css("background-color", "white")
-			   		.css("border", "thin solid black")
-					.hide();
+                    .addClass(cssClasses.dialogClass)
+                    .css("position", "absolute")
+                    .css("z-index", 99999)
+                    .css("background-color", "white")
+                    .css("border", "thin solid black")
+                    .hide();
 
     var $errorDivBase = $(document.createElement("div"))
-					  .addClass(cssClasses.ajaxErrorDisplayClass)
-					  .hide();
+                      .addClass(cssClasses.ajaxErrorDisplayClass)
+                      .hide();
 
     var $selectionButtonDivBase = $(document.createElement("div"))
-								.addClass(cssClasses.selectionButtonDivClass);
+                                .addClass(cssClasses.selectionButtonDivClass);
 
     var $selectionButtonBase = $(document.createElement("button"))
-							 .addClass(cssClasses.selectionButtonClass)
-							 .attr("type", "button");
+                             .addClass(cssClasses.selectionButtonClass)
+                             .attr("type", "button");
 
     var $loadingDivBase = $(document.createElement("div"))
-						 .addClass(cssClasses.loadingDivClass)
-						 .html("Loading ...") // todo - this probably shouldn't be hardcoded text  :\
-						 .hide();
+                         .addClass(cssClasses.loadingDivClass)
+                         .html("Loading ...") // todo - this probably shouldn't be hardcoded text  :\
+                         .hide();
 
     var $pagingDivBase = $(document.createElement("div"))
-					   .addClass(cssClasses.pagingDivClass);
+                       .addClass(cssClasses.pagingDivClass);
 
     var $nextPageButtonBase = $(document.createElement("button"))
-							.attr("type", "button")
-							.attr('disabled', 'disabled')
-							.html(" > ")
-							.addClass(cssClasses.nextPageButtonClass);
+                            .attr("type", "button")
+                            .attr('disabled', 'disabled')
+                            .html(" > ")
+                            .addClass(cssClasses.nextPageButtonClass);
 
     var $previousPageButtonBase = $(document.createElement("button"))
-								.attr("type", "button")
-								.attr('disabled', 'disabled')
-								.html(" < ")
-								.addClass(cssClasses.previousPageButtonClass);
+                                .attr("type", "button")
+                                .attr('disabled', 'disabled')
+                                .html(" < ")
+                                .addClass(cssClasses.previousPageButtonClass);
 
     var PluginKlass = function (options) {
         if (!options) throw "Cannot init plugin without init options";
@@ -132,21 +132,21 @@
 
         this.$pagingDiv = $pagingDivBase.clone();
         this.$pagingDiv.append(this.$previousPageButton)
-					   .append(this.$nextPageButton);
+                       .append(this.$nextPageButton);
 
         // setup dialog window position and behavior
         var pInputOffset = this.$input.offset();
         this.$dialog = $dialogBase.clone();
         this.$dialog.append(this.$exitButton)
-					.append(this.$pagingDiv)
-					.append(this.$errorDiv)
-					.append(this.$loadingDiv)
-					.append(this.$selectionButtonDiv)
-				    .css("top", pInputOffset.top + this.$input.outerHeight() + "px")
-				    .css("left", pInputOffset.left + "px")
-				    .css("min-height", "200px")//todo - customizable?
-				    .css("min-width", "200px")//todo - customizable?
-				    .appendTo($body);
+                    .append(this.$pagingDiv)
+                    .append(this.$errorDiv)
+                    .append(this.$loadingDiv)
+                    .append(this.$selectionButtonDiv)
+                    .css("top", pInputOffset.top + this.$input.outerHeight() + "px")
+                    .css("left", pInputOffset.left + "px")
+                    .css("min-height", "200px")//todo - customizable?
+                    .css("min-width", "200px")//todo - customizable?
+                    .appendTo($body);
 
         this.$input.on("focus" + strPluginEventNamespace, function (e) {
             self.fnShow();
@@ -182,8 +182,8 @@
             this.iPage--;
             this.fnSearch();
         },
-        fnSearch: function () {
-            var strInput = this.$input.val();
+        fnSearch: function (strSearchInput) {
+            var strInput = (typeof strSearchInput === 'undefined') ? this.$input.val() : strSearchInput;
             if (!strInput) return;
 
             var searchTokens = $.grep(strInput.split(/\s+/), function (token) {
@@ -240,8 +240,8 @@
                 var label = this.fnLabelMapper.call(next, next) || next.toString();
                 var $button = $selectionButtonBase.clone();
                 $button.html(label)
-					   .data(strSelectionButtonDataNamespace, { data: next, oPlugin: self })
-					   .on("click" + strPluginEventNamespace, self.fnSelectionButtonClick);
+                       .data(strSelectionButtonDataNamespace, { data: next, oPlugin: self })
+                       .on("click" + strPluginEventNamespace, self.fnSelectionButtonClick);
                 var div = document.createElement("div");
                 $button.appendTo(div);
                 this.resultButtons.push($button);
@@ -331,6 +331,13 @@
                 oPlugin = new PluginKlass(options);
                 $this.data(strPluginDataNamespace, oPlugin);
             }
+
+            // if caller specified an initial search term, kickoff a search
+            // so their dialog has stuff in it (potentially) before it's opened
+            if (options.strInitialSearch) {
+                var strInitialSearchString = (typeof options.strInitialSearch === 'string') ? options.strInitialSearch : options.strInitialSearch.toString();
+                oPlugin.fnSearch(strInitialSearchString);
+            }
         });
     }
 
@@ -357,7 +364,7 @@
         if (this.length <= 0) return this;
 
         var functionToCall,
-			argsToPass;
+            argsToPass;
 
         if (!options || typeof options === 'object') {
             functionToCall = fnPluginInit;
