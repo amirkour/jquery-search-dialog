@@ -25,7 +25,11 @@ $("input.searchBox").searchDialog({
   // your jquery-ified textbox.
   fnSelectionCB: function(selectedServerData){
     this.val(selectedServerData.label);
-  }
+  },
+  
+  // optional - will perform a search on startup
+  // after initialization is complete.
+  strInitialSearch: "inital search string"
   
 });
 ```
