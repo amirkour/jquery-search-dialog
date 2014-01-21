@@ -1,7 +1,16 @@
 jquery-search-dialog
 ====================
 
-turn textboxes into pageable, keyword searchable controls that allows you to quickly query and page through server data.
+A jquery plugin that creates a popup window on any dom element (though it's intended usage is on textboxes) for searching and paging through server data.
+
+Quick Summary
+-------------
+```javascript
+var $input=$("input.searchBox");
+$input.searchDialog({ ... options ... });
+```
+
+Now when $input gains focus, the search popup will appear. Typing search terms in $input and hitting 'enter' will send a query to the server and display the results for user selection.
 
 Usage
 -----
