@@ -27,8 +27,9 @@ $("input.searchBox").searchDialog({
     this.val(selectedServerData.label);
   },
   
-  // optional - will perform a search on startup
-  // after initialization is complete.
+  // optional - if present, will perform a
+  // search immediately upon the first 'show'
+  // of the plugin.
   strInitialSearch: "inital search string"
   
 });
