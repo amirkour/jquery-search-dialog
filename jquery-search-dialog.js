@@ -95,6 +95,7 @@
         this.resultButtons = []; // list of buttons to select from while searching
         this.iPage = 0;
         this.iPageSize = 10;
+        this.strInitialSearch = options.strInitialSearch;
 
         if (options.fnLabelMapper && typeof options.fnLabelMapper === 'function') {
             this.fnLabelMapper = options.fnLabelMapper;
@@ -294,6 +295,10 @@
         },
         fnShow: function () {
             this.$dialog.show();
+            if (this.strInitialSearch) {
+                this.fnSearch(this.strInitialSearch);
+                this.strInitialSearch = undefined;
+            }
         },
         fnHide: function () {
             this.fnClearErrors();
@@ -330,13 +335,6 @@
 
                 oPlugin = new PluginKlass(options);
                 $this.data(strPluginDataNamespace, oPlugin);
-            }
-
-            // if caller specified an initial search term, kickoff a search
-            // so their dialog has stuff in it (potentially) before it's opened
-            if (options.strInitialSearch) {
-                var strInitialSearchString = (typeof options.strInitialSearch === 'string') ? options.strInitialSearch : options.strInitialSearch.toString();
-                oPlugin.fnSearch(strInitialSearchString);
             }
         });
     }
