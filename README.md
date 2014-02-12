@@ -50,6 +50,10 @@ Assume you initialize a textbox with the code shown in the 'usage' section above
 
 http://your.domain.com/service/json/coolData?f=foo&f=bar&f=baz&page=0&pagesize=10
 
+And if you wanted to exclude certain keywords, you could type "back glug" in the exclusion textbox, and the http-get request would then look like this (notice the 'fe' query params for your exclusions):
+
+http://your.domain.com/service/json/coolData?f=foo&f=bar&f=baz&fe=back&fe=glug&page=0&pagesize=10
+
 Note: pagesize is currently hardcoded to 10.  If your server responds with data looking like this:
 
 [{label: "option 1", name: "foo"}, {label: "option 2", name: "bar"}, ... ]
