@@ -83,6 +83,9 @@
                                 .attr('disabled', 'disabled')
                                 .html(" < ")
                                 .addClass(cssClasses.previousPageButtonClass);
+    var $exclusionsInputBase = $(document.createElement("input"))
+                               .attr("type", "text")
+                               .attr("placeholder", "exclusions");
 
     var PluginKlass = function (options) {
         if (!options) throw "Cannot init plugin without init options";
@@ -131,9 +134,12 @@
             self.fnPreviousPageClick();
         });
 
+        this.$exclusionsInput = $exclusionsInputBase.clone();
+
         this.$pagingDiv = $pagingDivBase.clone();
         this.$pagingDiv.append(this.$previousPageButton)
-                       .append(this.$nextPageButton);
+                       .append(this.$nextPageButton)
+                       .append(this.$exclusionsInput);
 
         // setup dialog window position and behavior
         var pInputOffset = this.$input.offset();
@@ -157,6 +163,13 @@
                 self.fnSearch();
             }
         });
+
+        this.$exclusionsInput.on("keyup" + strPluginEventNamespace, function (e) {
+            if (e.which === 13) {
+                self.iPage = 0; // start the search at page 0
+                self.fnSearch();
+            }
+        });
     }
     $.extend(PluginKlass.prototype, {
         fnDestroy: function () {
@@ -164,6 +177,7 @@
             this.$nextPageButton.off(strPluginEventNamespace);
             this.$previousPageButton.off(strPluginEventNamespace);
             this.$input.off(strPluginEventNamespace);
+            this.$exclusionsInput.off(strPluginEventNamespace);
             this.$exitButton.off(strPluginEventNamespace);
 
             this.fnSelectionCB = null;
@@ -193,10 +207,18 @@
 
             if (!searchTokens || searchTokens.length <= 0) return;
 
+            var exclusionTokens = this.$exclusionsInput.val().split(/\s+/) || [];
+            var strExclusionUrlSegment = null;
+            if (exclusionTokens && exclusionTokens.length > 0) {
+                strExclusionUrlSegment = "&fe=" + exclusionTokens.join("&fe=");
+            } else {
+                strExclusionUrlSegment = '';
+            }
+
             this.fnLoading(true);
             this.fnClearErrors();
-            this.fnDisableButtons();
-            var url = encodeURI(this.url + "?f=" + searchTokens.join("&f=") + "&page=" + this.iPage + "&pagesize=" + this.iPageSize);
+            this.fnDisableInputs();
+            var url = encodeURI(this.url + "?f=" + searchTokens.join("&f=") + strExclusionUrlSegment + "&page=" + this.iPage + "&pagesize=" + this.iPageSize);
             $.ajax({
                 url: url,
                 context: this,
@@ -208,9 +230,10 @@
                 this.fnLoading(false);
             });
         },
-        fnDisableButtons: function () {
+        fnDisableInputs: function () {
             this.$nextPageButton.attr('disabled', 'disabled');
             this.$previousPageButton.attr('disabled', 'disabled');
+            this.$exclusionsInput.attr('disabled', 'disabled');
         },
         fnAjaxSuccessHandler: function (pData, strTextStatus, jqXHR) {
             if (!pData) {
@@ -229,6 +252,7 @@
             if (this.iPage > 0) {
                 this.$previousPageButton.attr('disabled', null);
             }
+            this.$exclusionsInput.attr('disabled', null);
 
             if (pData.length <= 0) {
                 this.fnShowError("No results");
@@ -259,6 +283,7 @@
                 } catch (ex) { }
             }
 
+            this.$exclusionsInput.attr('disabled', null);
             this.fnShowError(strError || "An unknown server error occurred");
         },
         fnSelectionButtonClick: function (e) {
