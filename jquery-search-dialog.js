@@ -17,6 +17,7 @@
  * https://github.com/amirkour/jquery-search-dialog
  *
  * Depends on jquery, and currently only tested/verified on jquery 1.9+.
+ *
  */
 (function ($, document, undefined) {
     var $body = $("body");
@@ -39,6 +40,7 @@
         and: 1,
         the: 1
     };
+    var arrayOfRegexesToStripFromSearchInput = [new RegExp(';', 'gi')];
 
     var $exitButtonBase = $(document.createElement("button"))
                         .html("X")//TODO - customizable?
@@ -85,7 +87,7 @@
                                 .addClass(cssClasses.previousPageButtonClass);
     var $exclusionsInputBase = $(document.createElement("input"))
                                .attr("type", "text")
-                               .attr("placeholder", "exclusions");
+                               .attr("value", "");
 
     var PluginKlass = function (options) {
         if (!options) throw "Cannot init plugin without init options";
@@ -142,32 +144,40 @@
                        .append(this.$exclusionsInput);
 
         // setup dialog window position and behavior
-        var pInputOffset = this.$input.offset();
         this.$dialog = $dialogBase.clone();
         this.$dialog.append(this.$exitButton)
                     .append(this.$pagingDiv)
                     .append(this.$errorDiv)
                     .append(this.$loadingDiv)
                     .append(this.$selectionButtonDiv)
-                    .css("top", pInputOffset.top + this.$input.outerHeight() + "px")
-                    .css("left", pInputOffset.left + "px")
-                    .css("min-height", "200px")//todo - customizable?
-                    .css("min-width", "200px")//todo - customizable?
                     .appendTo($body);
+        this.fnReposition();
 
         this.$input.on("focus" + strPluginEventNamespace, function (e) {
             self.fnShow();
-        }).on("keyup" + strPluginEventNamespace, function (e) {
+        }).on("keydown" + strPluginEventNamespace, function (e) {
             if (e.which === 13) {
+                e.preventDefault();
                 self.iPage = 0; // start the search at page 0
                 self.fnSearch();
+                return false;
+            }
+        }).on("focusout" + strPluginEventNamespace, function (e) {
+            if (!self.$dialog.is(":hover")) {
+                self.fnHide();
             }
         });
 
-        this.$exclusionsInput.on("keyup" + strPluginEventNamespace, function (e) {
+        this.$exclusionsInput.on("keydown" + strPluginEventNamespace, function (e) {
             if (e.which === 13) {
+                e.preventDefault();
                 self.iPage = 0; // start the search at page 0
                 self.fnSearch();
+                return false;
+            }
+        }).on("focusout" + strPluginEventNamespace, function (e) {
+            if (!self.$dialog.is(":hover")) {
+                self.fnHide();
             }
         });
     }
@@ -200,6 +210,10 @@
         fnSearch: function (strSearchInput) {
             var strInput = (typeof strSearchInput === 'undefined') ? this.$input.val() : strSearchInput;
             if (!strInput) return;
+
+            $.each(arrayOfRegexesToStripFromSearchInput, function (index, reToStrip) {
+                strInput = strInput.replace(reToStrip, '');
+            });
 
             var searchTokens = $.grep(strInput.split(/\s+/), function (token) {
                 return !hashOfTokensToOmitDuringSearch[token];
@@ -247,12 +261,12 @@
 
             this.fnCleanupPreviousResults();
             if (pData.length >= this.iPageSize) {
-                this.$nextPageButton.attr('disabled', null);
+                this.$nextPageButton.removeAttr('disabled');
             }
             if (this.iPage > 0) {
-                this.$previousPageButton.attr('disabled', null);
+                this.$previousPageButton.removeAttr('disabled');
             }
-            this.$exclusionsInput.attr('disabled', null);
+            this.$exclusionsInput.removeAttr('disabled');
 
             if (pData.length <= 0) {
                 this.fnShowError("No results");
@@ -283,7 +297,7 @@
                 } catch (ex) { }
             }
 
-            this.$exclusionsInput.attr('disabled', null);
+            this.$exclusionsInput.removeAttr('disabled');
             this.fnShowError(strError || "An unknown server error occurred");
         },
         fnSelectionButtonClick: function (e) {
@@ -319,6 +333,7 @@
             this.$errorDiv.html(strError).show();
         },
         fnShow: function () {
+            this.fnReposition();
             this.$dialog.show();
             if (this.strInitialSearch) {
                 this.fnSearch(this.strInitialSearch);
@@ -328,6 +343,13 @@
         fnHide: function () {
             this.fnClearErrors();
             this.$dialog.hide();
+        },
+        fnReposition: function () {
+            var pInputOffset = this.$input.offset();
+            this.$dialog.css("top", pInputOffset.top + this.$input.outerHeight() + "px")
+                        .css("left", pInputOffset.left + "px")
+                        .css("min-height", "200px")//todo - customizable?
+                        .css("min-width", "200px")//todo - customizable?
         }
     });
 
