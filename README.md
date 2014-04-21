@@ -72,3 +72,8 @@ API
 // unbinds all plugin-related events and destroys all plugin DOM elements.
 $initializedInput.searchDialog("destroy");
 ```
+
+Known Issues
+------------
+* page size is currently hardcoded to 10
+* the initial width/height of the plugin is hardcoded to 200px
