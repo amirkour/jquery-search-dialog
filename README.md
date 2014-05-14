@@ -77,3 +77,4 @@ Known Issues
 ------------
 * page size is currently hardcoded to 10
 * the initial width/height of the plugin is hardcoded to 200px
+* can take advantage of event bubbling for dynamicly generated buttons
